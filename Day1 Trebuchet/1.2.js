@@ -13,104 +13,34 @@ const dict = {
   seven: 7,
   eight: 8,
   nine: 9,
-  '1': 1,
-  '2': 2,
-  '3': 3,
-  '4': 4,
-  '5': 5,
-  '6': 6,
-  '7': 7,
-  '8': 8,
-  '9': 9,
-}
-
-let map = {
-  one: [],
-  two: [],
-  three: [],
-  four: [],
-  five: [],
-  six: [],
-  seven: [],
-  eight: [],
-  nine: [],
-  1: [],
-  2: [],
-  3: [],
-  4: [],
-  5: [],
-  6: [],
-  7: [],
-  8: [],
-  9: [],
 }
 
 let sum = 0
+const keys = [ "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
-const findIndexes = (map, keys, v) => {
+const map = []
+
+data.forEach((v)=>{
+  let a = null
+  let b = null
+
   keys.forEach((key) => {
+    const mk = map[key] = []
     const first = v.indexOf(key)
     const last = v.lastIndexOf(key)
 
-    if (first !== -1) map[key][0] = (first)
-    if (last !== -1 && last !== first) map[key][1] = (last)
-  })
-}
+    if (first !== -1) mk[0] = (first)
+    if (last !== -1 && last !== first) mk[1] = (last)
 
-const findSmallest = (map, keys) => {
-  let smallestKey = null
-  keys.forEach((key) => {
-    let c = map[key]
+    let c = mk
+    let l = map[b]
     if (c.length > 0) {
-      if (smallestKey === null || c[0] < map[smallestKey][0]) smallestKey = key
-    }
-  })
-  return dict[smallestKey]
-}
-
-const findLargest = (map, keys) => {
-  let largestKey = null
-  keys.forEach((key) => {
-    let c = map[key]
-    let l = map[largestKey]
-    if (c.length > 0) {
-      if (largestKey === null || c[c.length - 1] > l[l.length - 1]) largestKey = key
+      a === null || c[0] < map[a][0] ? a = key : false
+      b === null || c[c.length - 1] > l[l.length - 1] ? b = key : false
     }
   })
 
-  return dict[largestKey]
-}
-
-data.forEach((v)=>{
-  map = {
-    one: [],
-    two: [],
-    three: [],
-    four: [],
-    five: [],
-    six: [],
-    seven: [],
-    eight: [],
-    nine: [],
-    1: [],
-    2: [],
-    3: [],
-    4: [],
-    5: [],
-    6: [],
-    7: [],
-    8: [],
-    9: [],
-  }
-
-  const keys = Object.keys(map)
-
-  findIndexes(map, keys, v)
-
-  a = findSmallest(map, keys)
-  b = findLargest(map, keys)
-
-  sum += +a*10 + +b
+  sum += +(dict[a] | +a)*10 + +(dict[b] | +b)
 })
 console.timeEnd("time")
 
