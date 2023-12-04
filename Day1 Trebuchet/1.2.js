@@ -29,8 +29,8 @@ data.forEach((v)=>{
     const first = v.indexOf(key)
     const last = v.lastIndexOf(key)
 
-    if (first !== -1) mk[0] = (first)
-    if (last !== -1 && last !== first) mk[1] = (last)
+    if (first !== -1) mk[0] = first
+    if (last !== -1 && last !== first) mk[1] = last
 
     let c = mk
     let l = map[b]

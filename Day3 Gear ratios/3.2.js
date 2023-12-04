@@ -1,6 +1,8 @@
 const fs = require('fs')
 const data = fs.readFileSync(__dirname + '/input.txt', "utf-8").split('\r\n')
 
+console.time("time")
+
 const starArr = {}
 const re = /(\d+)/g
 
@@ -60,5 +62,7 @@ Object.keys(starArr).forEach(k=>{
     res += +starArr[k][0] * +starArr[k][1]
   }
 })
+
+console.timeEnd("time")
 
 console.log(res)
