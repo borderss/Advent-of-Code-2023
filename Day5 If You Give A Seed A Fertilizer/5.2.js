@@ -1,88 +1,92 @@
 const fs = require('fs')
 const data = fs.readFileSync(__dirname + '/input.txt', "utf-8").split('\r\n')
 
-let sum = 0
-
 console.time("time")
 
-const initialSeeds = data[0].split(": ")[1].split(" ")
+const seeds = data[0].split(": ")[1].split(" ")
 
-const ranges = []
+const mappings = [];
+let isNewMapping = false;
 
-let x = 0
-while(x < initialSeeds.length) {
-  ranges.push({
-    from: +initialSeeds[x],
-    to: +initialSeeds[x] + +initialSeeds[x+1]
-  })
-
-x += 2
+for (let line of data.slice(1)) {
+  if (!line.trim()) { isNewMapping = true; continue }
+  if (isNewMapping) {
+    mappings.push([]);
+    isNewMapping = false;
+  } else {
+    const [dest, source, range] = line.split(' ').map(Number);
+    mappings[mappings.length - 1].push([source, dest, range]);
+  }
 }
 
-console.log(ranges)
+for (const mapping of mappings) {
+  mapping.sort((a, b) => a[0] - b[0])
+}
 
-let startId = null
-let endId = null
+let ranges = []
 
-for(let i = 2; i <= data.length; i++) {
-  if (data[i] !== undefined && data[i].includes("map:")) {
-    startId = i + 1
+let from = null
+for (let i = 0; i < seeds.length; i++) {
+  if (i % 2 === 0) {
+    from = +seeds[i]
+  } else {
+    ranges.push([from, from + +seeds[i] - 1])
   }
-  if (data[i] === "" || data[i] === undefined) {
-    endId = i - 1
-  }
+}
 
-  if (startId && endId) {
-    while (startId <= endId) {
-      let split = data[startId].split(" ")
-      const mappings = ({
-        dest: {
-          from: +split[0],
-          to: +split[0] + +split[2],
-        },
-        src: {
-          from: +split[1],
-          to: +split[1] + +split[2],
-        }
-      })
+ranges.sort((a, b) => a[0] - b[0])
 
-      ranges.forEach(range => {
-        if (+mappings.src.from <= rang)
-  
-        actualSeedRange.forEach((k, index) => {
-          if (
-            seedChanged[index] != true && 
-            +mappings.src.from <= +actualSeedRange[index] && +actualSeedRange[index] <= +mappings.src.to
-          ) {
-            actualSeedRange[index] = +actualSeedRange[index] - (+split[1]) + (+split[0])
-          }
-          if (actualSeedRange[index] === undefined) actualSeedRange[index] = k
-        })
-      })
+for (let i = 0; i < mappings.length; i++) {
+  let nthMap = 0
+  let newRanges = []
 
-      startId++
+  let range = null;
+  while (ranges.length || range) {
+    if (!range) range = ranges.shift()
+
+    const range0 = range[0]
+    const range1 = range[1]
+
+    if (nthMap >= mappings[i].length) {
+      newRanges.push([range0, range1])
+      range = null
+      continue
     }
 
-    startId = null
-    endId = null
+    const start = mappings[i][nthMap][0]
+    const end = mappings[i][nthMap][0] + mappings[i][nthMap][2] - 1
+    const offset = mappings[i][nthMap][1] - mappings[i][nthMap][0]
+
+    if (range0 < start && range1 < start) {
+      newRanges.push([range0, range1])
+      range = null
+    } else if (range0 >= start && range1 <= end) {
+      newRanges.push([range0 + offset, range1 + offset])
+      range = null
+    } else if (range0 <= start && range1 <= end) {
+      if (range0 < start) newRanges.push([range0, start - 1])
+      newRanges.push([start + offset, range1 + offset])
+      range = null
+    } else if (range0 <= start && range1 >= end) {
+      if (range0 < start) newRanges.push([range0, start - 1])
+      newRanges.push([start + offset, end + offset]);
+      if (range1 > end) ranges.unshift([end + 1, range1])
+      range = null;
+    } else if (range0 <= end && range1 > end) {
+      newRanges.push([range0 + offset, end + offset])
+      ranges.unshift([end + 1, range1])
+      range = null;
+    } else {
+      nthMap += 1;
+    }
   }
+
+  ranges = newRanges
+  ranges.sort((a, b) => a[0] - b[0])
 }
 
-let smallest = actualSeedRange[0]
-
-actualSeedRange.forEach(v => {
-  if (+v < smallest) smallest = +v
-})
-
-smallestArr.push(smallest)
-
-let realSmallest = smallestArr[0]
-
-smallestArr.forEach(v => {
-  if (+v < realSmallest) realSmallest = +v
-})
+const loc = Math.min(...ranges.map(range => range[0]))
 
 console.timeEnd("time")
-console.log(realSmallest)
 
-console.log(sum)
+console.log(loc)
